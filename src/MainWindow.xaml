@@ -1,0 +1,95 @@
+﻿<Window x:Class="MinecraftServerMaker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MinecraftServerMaker"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="600">
+    <Window.Resources>
+        <Style x:Key="YesButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#4CAF50" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}"
+                        CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="NoButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FF5252" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}"
+                        CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid HorizontalAlignment="Center" Width="600">
+        <Grid.Background>
+            <ImageBrush ImageSource="assets\wallpaper.png"/>
+        </Grid.Background>
+
+
+        <Label Content="Minecraft Server Installer" HorizontalAlignment="Center" Margin="0,91,0,0" VerticalAlignment="Top" Height="95" Width="580" FontSize="45" FontWeight="Black" Foreground="White"/>
+        <Grid Margin="0,187,0,-187">
+            <Label Content="Do you want mods?" HorizontalAlignment="Center" Margin="0,293,0,0" VerticalAlignment="Top" Height="50" Width="316" FontSize="30" FontWeight="Black" Foreground="White"/>
+            <Button Name="BtYes"  Content="Yes" FontSize="30" Foreground="White" Background="Lime" HorizontalAlignment="Left" Margin="100,348,0,0" VerticalAlignment="Top" Height="57" Width="127" Click="YesMods"/>
+            <Button BorderBrush="White" BorderThickness="5" Name="BtNo"   Content="No" FontSize="30" Foreground="White" Background="Red" HorizontalAlignment="Left" Margin="394,348,0,0" VerticalAlignment="Top" Height="57" Width="127" Click="NoMods"/>
+            <Label Content="Which minecraft version?" HorizontalAlignment="Center" Margin="0,142,0,0" VerticalAlignment="Top" Height="50" Width="386" FontSize="30" FontWeight="Black" Foreground="White"/>
+            <Label Content="Choose folder for install" HorizontalAlignment="Center" Margin="0,-21,0,0" VerticalAlignment="Top" Height="50" Width="386" FontSize="30" FontWeight="Black" Foreground="White"/>
+            <TextBlock Background="White"  Name="FilesLocation"  FontSize="20" HorizontalAlignment="Center" Margin="0,34,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="490" Height="53" />
+            <Button Content="Choose Folder" FontSize="30" Foreground="White" Background="Lime" HorizontalAlignment="Center" Margin="0,92,0,0" VerticalAlignment="Top" Height="45" Width="490" Click="ChooseFolder"/>
+
+            <ComboBox Name="GetMcVersion" FontSize="20" Margin="153,206,153,515" SelectionChanged="ComboBox_SelectionChanged">
+                <ComboBoxItem>1.19.4</ComboBoxItem>
+                <ComboBoxItem>1.19.3</ComboBoxItem>
+                <ComboBoxItem>1.19.2</ComboBoxItem>
+                <ComboBoxItem>1.19.1</ComboBoxItem>
+                <ComboBoxItem>1.19</ComboBoxItem>
+                <ComboBoxItem>1.18.2</ComboBoxItem>
+                <ComboBoxItem>1.18.1</ComboBoxItem>
+                <ComboBoxItem>1.18</ComboBoxItem>
+                <ComboBoxItem>1.17.1</ComboBoxItem>
+                <ComboBoxItem>1.17</ComboBoxItem>
+                <ComboBoxItem>1.16.5</ComboBoxItem>
+
+            </ComboBox>
+            <Button Name="Start"   Content="START" FontSize="30" Foreground="White" Background="Lime" HorizontalAlignment="Left" Margin="100,478,0,0" VerticalAlignment="Top" Height="56" Width="420" Click="StartInstallation"/>
+        </Grid>
+
+
+
+    </Grid>
+
+
+</Window>
+
+    
