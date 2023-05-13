@@ -1,31 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Management;
 
 namespace MinecraftServerMaker
 {
 
     public partial class MainWindow : Window
     {
+
         string InstallationLocation;
         bool mods = false;
-        string McVersion = "1.19.4";
-
-
+        string McVersion = "1.19.4";  //default
+        int RAMforServer = 2;
 
 
 
@@ -33,7 +24,6 @@ namespace MinecraftServerMaker
         {
             InitializeComponent();
         }
-
 
         private void ChooseFolder(object sender, RoutedEventArgs e)
         {
@@ -72,53 +62,51 @@ namespace MinecraftServerMaker
             McVersion = ChoosedMcVersion.Replace("System.Windows.Controls.ComboBoxItem: ", "");
         }
 
+        //---------------Main---------------
+
         private void StartInstallation(object sender, RoutedEventArgs e)
         {
 
-
-            if (FolderCheck() == 0)
+            if (FolderCheck() == 0 && GetRAM() != -1)
             {
-                
-
-
 
                 if (mods == true)
                 {
-                    string url = $"https://meta.fabricmc.net/v2/versions/loader/{McVersion}/0.14.19/0.11.2/server/jar"; // adres URL pliku do pobrania
 
-
-                    using (WebClient client = new WebClient())
+                    if(CheckRAM() == true)
                     {
-                        try
-                        {
-                            client.DownloadFile(url, InstallationLocation); // pobranie pliku
-                            MessageBox.Show("Plik został pobrany i zapisany w: " + InstallationLocation);
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("Wystąpił błąd: " + ex.Message);
-                        }
+
+                        InstallServerFiles();
+
+                        MessageBox.Show($"All done. Wait until you see end of preparing spawm area.\n To stop server just close terminal. \n\n Server location: {InstallationLocation} \n Server version: {McVersion} \n RAM for server {RAMforServer} \n Mods: {mods}", "All Done & status");
+
+                        RunServer();
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Change RAM amount", "Error: RAM");
                     }
 
-
                 }
-
-
 
             }
             else if (FolderCheck() == 1)
             {
-                MessageBox.Show("Folder nie jest pusty.");
+                MessageBox.Show("Folder isn't empty.", "Error: Folder");
+            }
+            else if (GetRAM() == -1)
+            {
+                MessageBox.Show("Bad amount of RAM", "Error: RAM");
             }
             else
             {
-                MessageBox.Show("This folder doesn't exist");
+                MessageBox.Show("This folder doesn't exist", "Error: Folder");
             }
 
-
-
-
         }
+
+        //---------------Main---------------
 
         private int FolderCheck()
         {
@@ -138,6 +126,118 @@ namespace MinecraftServerMaker
                 return 2;
             }
         }
+
+        private int GetRAM()
+        {
+            string input = CountRAM.Text;
+            int result;
+
+            if (int.TryParse(input, out result))
+            {
+                return result;
+            }
+            else
+            {
+                return 1000;
+            }
+
+        }
+
+        private bool CheckRAM()
+        {
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT Capacity FROM Win32_PhysicalMemory");
+
+            long totalMemoryBytes = 0;
+            foreach (ManagementObject mo in searcher.Get())
+            {
+                long capacity = Convert.ToInt64(mo["Capacity"]);
+                totalMemoryBytes += capacity;
+            }
+
+            double totalMemoryGB = (double)totalMemoryBytes / (1024 * 1024 * 1024);
+
+            double finall_ram = (totalMemoryGB - 5) - GetRAM();
+
+
+
+            
+
+            if (finall_ram >= 2)
+            {
+                RAMforServer = GetRAM();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        private void CreateEula()
+        {
+            string EulaPath = InstallationLocation + @"\eula.txt";
+
+            if (!File.Exists(EulaPath))
+            {
+
+                using (StreamWriter sw = File.CreateText(EulaPath))
+                {
+                    sw.WriteLine("eula=true");
+
+                }
+            }
+
+        }
+
+        private void InstallServerFiles()
+        {
+            try
+            {
+                string url = $"https://meta.fabricmc.net/v2/versions/loader/{McVersion}/0.14.19/0.11.2/server/jar"; 
+
+                ProcessStartInfo processStartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c curl {url} --output \"{InstallationLocation}\\fabric-server-mc.{McVersion}-loader.0.14.19-launcher.0.11.2.jar\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                Process process = new Process();
+                process.StartInfo = processStartInfo;
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+
+                CreateEula();
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+
+        }
+
+
+        private void RunServer()
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = $"{InstallationLocation}";
+            startInfo.Arguments = $"/k java -Xmx{RAMforServer}G -jar fabric-server-mc.{McVersion}-loader.0.14.19-launcher.0.11.2.jar nogui";
+            Process.Start(startInfo);
+
+        }
+
+
+
     }
 
 }
@@ -148,4 +248,8 @@ namespace MinecraftServerMaker
 
 
 //todo:
-//dokńcz, dodaj plik txt eula=true, wykonaj plik servera jar, dodaj mc bez modów
+// dodaj mc bez modów
+
+
+
+
